@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
-use App\Models\customer;
-use GuzzleHttp\Psr7\Response;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use PhpParser\Node\Stmt\Return_;
 
-class Customercontroller extends Controller
+class userController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,7 +16,6 @@ class Customercontroller extends Controller
     public function index()
     {
         //
-        return customer::all();
     }
 
     /**
@@ -45,15 +41,30 @@ class Customercontroller extends Controller
             'name' => 'required|Alpha',
             'email' => 'required|email',
             'password' => 'required',
-          ]);
+        ]);
 
-       //return customer::create($request->all());
-       $data= new customer;
-       $data->name=$request->name;
-       $data->email=$request->email;
-       $data->password=Hash::make($request->password) ;
-       return $data->save();
-          
+        $data = new user;
+        $data->name = $request->name;
+        $data->email = $request->email;
+        $data->password = Hash::make($request->password);
+        $data->save();
+
+        $token = $data->createToken($request->name)->plainTextToken;
+
+        return response([
+
+            'data' => $data,
+            'token' => $token
+
+        ], 201);
+    }
+
+    public function logout()
+    {
+        auth()->User()->tokens()->delete();
+        return response([
+            'message' => 'Succefully logged out!!'
+        ]);
     }
 
     /**
@@ -65,7 +76,6 @@ class Customercontroller extends Controller
     public function show($id)
     {
         //
-        //return customer::find($id);
     }
 
     /**
@@ -86,22 +96,9 @@ class Customercontroller extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
-    
-        
-        $user = customer::find($request->id);
-        $user->name=$request->name;
-        $user->email = $request->email;
-        $user->password=Hash::make($request->password) ;
-        $user->password = Hash::make($request->password);
-        if($user->save())  {
-
-            return ["response"=>"updated"];
-        }else{
-            return ["response"=>"not updated"];
-        }
-
+        //
     }
 
     /**
@@ -113,29 +110,5 @@ class Customercontroller extends Controller
     public function destroy($id)
     {
         //
-                $data=customer::find($id)->delete();
-
-                if($data){
-
-                    return ["Response"=>"deleted"];
-                }
-
-                
-    }
-
-
-     /**
-     * search the specified resource from storage.
-     *
-     * @param  int  $name
-     * @return \Illuminate\Http\Response
-     */
-    public function search($name)   
-    {
-        //
-               $data=customer::where('name',$name)->get();
-               return $data;
-               
-               
     }
 }
