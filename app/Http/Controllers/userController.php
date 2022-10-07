@@ -59,12 +59,44 @@ class userController extends Controller
         ], 201);
     }
 
+
+    public function login(Request $request)
+    {
+
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+
+        ]);
+
+        $user= user::where('email',$request->email)->first();
+
+        if($user && Hash::check($request->password,$user->password))
+        {
+            $token = $user->createToken($request->email)->plainTextToken;
+
+            return response([
+                    'token'=>$token,
+                    'message'=>"login",
+                    'status'=>'success'
+
+            ],201);
+
+        }
+    }
+
+       
+
     public function logout()
     {
-        auth()->User()->tokens()->delete();
+
+        auth()->user()->tokens()->delete();
+
         return response([
-            'message' => 'Succefully logged out!!'
-        ]);
+
+                'message' =>'Successfully Logout !!',
+                'status' => 'success'
+        ],200);
     }
 
     /**
