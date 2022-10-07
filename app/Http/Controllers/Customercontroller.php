@@ -98,7 +98,9 @@ class Customercontroller extends Controller
         if($user->save())  {
 
             return ["response"=>"updated"];
+
         }else{
+            
             return ["response"=>"not updated"];
         }
 
@@ -118,6 +120,8 @@ class Customercontroller extends Controller
                 if($data){
 
                     return ["Response"=>"deleted"];
+                }else{
+                    return ["Response"=>"Not delete"];
                 }
 
                 
