@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
+use Illuminate\Support\Facades\Auth;
+
 class userController extends Controller
 {
     /**
@@ -37,7 +39,7 @@ class userController extends Controller
     public function store(Request $request)
     {
         //
-        $validatedData = $request->validate([
+        $request->validate([
             'name' => 'required|Alpha',
             'email' => 'required|email',
             'password' => 'required',
@@ -54,38 +56,44 @@ class userController extends Controller
         return response([
 
             'data' => $data,
-            'token' => $token
+            'token' => $token,
+            'status'=>'success',
+            'message'=>'Insert recors'
 
         ], 201);
+
     }
 
+//login user and genrate token
 
-    public function login(Request $request)
-    {
+    // public function login(Request $request)
+    // {
 
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+    //     $request->validate([
+    //         'email' => 'required|email',
+    //         'password' => 'required',
 
-        ]);
+    //     ]);
 
-        $user= user::where('email',$request->email)->first();
+    //     $user=user::where('email',$request->email)->first();
 
-        if($user && Hash::check($request->password,$user->password))
-        {
-            $token = $user->createToken($request->email)->plainTextToken;
+    //     if($user && Hash::check($request->password,$user->password))
+    //     {
+    //         $token = $user->createToken($request->email)->plainTextToken;
 
-            return response([
-                    'token'=>$token,
-                    'message'=>"login",
-                    'status'=>'success'
+    //         return response([
+    //                 'token'=>$token,
+    //                 'message'=>"login",
+    //                 'status'=>'success'
 
-            ],201);
+    //         ],201);
 
-        }
-    }
+    //     }
+    // }
+
 
        
+//logout user and delete token
 
     public function logout()
     {
@@ -142,5 +150,45 @@ class userController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+  ///login user
+
+    public function login(Request $request){
+        
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+            
+        ]);
+ 
+        $user= request(['email', 'password']);
+        if(!Auth::attempt($request->only('email', 'password'))){
+            return response()->json([
+                'message'=> 'Invalid email or password'
+            ], 401);
+        }
+           
+ 
+        $user = $request->user();
+        $token = $user->createToken('AccessToken')->plainTextToken;
+
+        User::where('email',$request->email)->update([
+
+            'remember_token' => $token,
+
+         ]); 
+ 
+         
+        $user->access_token = $token;
+       
+        return response()->json([
+            "user"=>$user,
+            "login"=>'Login success'
+        ], 200);
+
+        
+        
+
     }
 }

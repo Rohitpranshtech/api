@@ -17,29 +17,22 @@ use  App\Http\Controllers\userController;
 |
 */
 
-Route::middleware(['auth:sanctum'])->group(function() {
-    Route::post('logout',[userController::class,'logout']);
-  });
+Route::middleware(['auth:sanctum'])->group(function () {
+  Route::post('logout', [userController::class, 'logout']);
+  Route::get('customer', [Customercontroller::class, 'index']);
+  Route::post('customer1', [Customercontroller::class, 'store']);
+  Route::put('update', [Customercontroller::class, 'update']);
+  Route::resource('users', Customercontroller::class);
+  Route::get('customer/search/{name}', [Customercontroller::class, 'search']);
+  
+});
 
-Route::get('customer',[Customercontroller::class,'index']);
-Route::post('customer1',[Customercontroller::class,'store']);
-Route::put('update',[Customercontroller:: class,'update']);
+
+
+
 //Route::delete('delete',[Customercontroller:: class,'destroy']);
-Route::resource('users',Customercontroller::class);
-Route::get('customer/search/{name}',[Customercontroller::class,'search']);
-
-Route::post('register',[userController::class,'store']);
-
-
-
+Route::post('register', [userController::class, 'store']);
+// Route::post('login', [userController::class, 'login']);
 Route::post('login', [userController::class, 'login']);
 
 
-// Route::middleware(['auth:sanctum'])->group(function(){
-//     Route::get('customer',[Customercontroller::class,'index']);
-//     Route::post('customer1',[Customercontroller::class,'store']);
-//     Route::put('update',[Customercontroller:: class,'update']);
-//     //Route::delete('delete',[Customercontroller:: class,'destroy']);
-//     Route::resource('users',Customercontroller::class);
-//     Route::get('customer/search/{name}',[Customercontroller::class,'search']);
-// });
